@@ -1,4 +1,4 @@
-dev:
+run:
 	sudo docker compose up --build -d --remove-orphans
 
 stop:
