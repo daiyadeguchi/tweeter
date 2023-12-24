@@ -7,20 +7,23 @@ import (
 )
 
 const (
-	host     = "localhost"
+	host     = "postgres"
 	port     = 5432
 	user     = "postgres"
 	password = "pass123"
 	dbname   = "tweeter"
 )
 
-func ConnectPostgres() {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+"password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+func ConnectPostgres() *sql.DB {
+	psqlInfo := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", user, password, host, port, dbname)
 	db, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
-
+	// Check the connection
+	if err = db.Ping(); err != nil {
+		panic(err)
+	}
 	fmt.Println("Successfully connected")
+	return db
 }
