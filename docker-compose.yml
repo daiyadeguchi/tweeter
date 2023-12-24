@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres
+    restart: unless-stopped
+    user: postgres
+    environment:
+      - POSTGRES_DB=tweeter
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pass123
+    ports:
+      - 5432:5432
+
+  backend:
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    ports:
+      - 1323:1323
+    restart: unless-stopped
+    links:
+      - postgres
+    environment:
+      POSTS_URL: postgres:5432

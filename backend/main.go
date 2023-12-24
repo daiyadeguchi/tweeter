@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/daiyadeguchi/tweeter/db"
+	"github.com/daiyadeguchi/tweeter/backend/db"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
