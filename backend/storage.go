@@ -23,6 +23,7 @@ type Storage interface {
 	CreatePost(*types.Post) error
 	DeletePost(*types.Post) error
 	UpdatePost(*types.Post) error
+	GetPosts() ([]*types.Post, error)
 	GetPostByID(int) (*types.Post, error)
 }
 
@@ -44,4 +45,55 @@ func NewPostgresConnection() (*PostgresStore, error) {
 	return &PostgresStore{
 		db: db,
 	}, nil
+}
+
+func (s *PostgresStore) CreateAccount(account *types.Account) error {
+	panic("implement me")
+}
+
+func (s *PostgresStore) DeleteAccount(i int) error {
+	panic("implement me")
+}
+
+func (s *PostgresStore) UpdateAccount(account *types.Account) error {
+	panic("implement me")
+}
+
+func (s *PostgresStore) GetAccountByID(i int) (*types.Account, error) {
+	panic("implement me")
+}
+
+func (s *PostgresStore) CreatePost(post *types.Post) error {
+	panic("implement me")
+}
+
+func (s *PostgresStore) DeletePost(post *types.Post) error {
+	panic("implement me")
+}
+
+func (s *PostgresStore) UpdatePost(post *types.Post) error {
+	panic("implement me")
+}
+
+func (s *PostgresStore) GetPostByID(i int) (*types.Post, error) {
+	panic("implement me")
+}
+
+func (s *PostgresStore) GetPosts() ([]*types.Post, error) {
+	rows, err := s.db.Query("SELECT * FROM posts")
+	if err != nil {
+		return nil, err
+	}
+
+	var posts []*types.Post
+	for rows.Next() {
+		post := new(types.Post)
+		err := rows.Scan(&post.UserID, &post.Body)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+
+	return posts, nil
 }
