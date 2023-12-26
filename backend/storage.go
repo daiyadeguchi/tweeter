@@ -47,6 +47,33 @@ func NewPostgresConnection() (*PostgresStore, error) {
 	}, nil
 }
 
+func (s *PostgresStore) Init() error {
+	err := s.createAccountTable()
+	err = s.createPostTable()
+	return err
+}
+
+func (s *PostgresStore) createAccountTable() error {
+	query := `create table if not exists account (
+			id serial primary key, 
+			username varchar(100), 
+			email varchar(100), 
+			encrypted_password varchar(100)
+	)`
+	_, err := s.db.Exec(query)
+	return err
+}
+
+func (s *PostgresStore) createPostTable() error {
+	query := `create table if not exists post (
+			id serial primary key, 
+			user_id integer, 
+			post_body varchar(500)
+	)`
+	_, err := s.db.Exec(query)
+	return err
+}
+
 func (s *PostgresStore) CreateAccount(account *types.Account) error {
 	panic("implement me")
 }
@@ -80,7 +107,7 @@ func (s *PostgresStore) GetPostByID(i int) (*types.Post, error) {
 }
 
 func (s *PostgresStore) GetPosts() ([]*types.Post, error) {
-	rows, err := s.db.Query("SELECT * FROM posts")
+	rows, err := s.db.Query("SELECT * FROM post")
 	if err != nil {
 		return nil, err
 	}
