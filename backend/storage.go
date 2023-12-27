@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/daiyadeguchi/tweeter/backend/types"
 	_ "github.com/lib/pq"
+	"log"
 )
 
 const (
@@ -91,7 +92,12 @@ func (s *PostgresStore) GetAccountByID(i int) (*types.Account, error) {
 }
 
 func (s *PostgresStore) CreatePost(post *types.Post) error {
-	panic("implement me")
+	rows, err := s.db.Query("insert into post (user_id, post_body) values ($1, $2)", post.UserID, post.Body)
+	if err != nil {
+		return err
+	}
+	log.Println("Successfully inserted:", rows)
+	return nil
 }
 
 func (s *PostgresStore) DeletePost(post *types.Post) error {
@@ -107,7 +113,7 @@ func (s *PostgresStore) GetPostByID(i int) (*types.Post, error) {
 }
 
 func (s *PostgresStore) GetPosts() ([]*types.Post, error) {
-	rows, err := s.db.Query("SELECT * FROM post")
+	rows, err := s.db.Query("select * from post")
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +121,7 @@ func (s *PostgresStore) GetPosts() ([]*types.Post, error) {
 	var posts []*types.Post
 	for rows.Next() {
 		post := new(types.Post)
-		err := rows.Scan(&post.UserID, &post.Body)
+		err := rows.Scan(&post.ID, &post.UserID, &post.Body)
 		if err != nil {
 			return nil, err
 		}
