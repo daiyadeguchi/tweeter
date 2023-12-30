@@ -25,6 +25,7 @@ func (s *APIServer) Run() {
 	log.Println("API server running on port: " + s.listenAddr)
 
 	e.GET("/", s.handleGetPosts)
+	e.GET(":id", s.handleGetPostByID)
 	e.POST("/new-post", s.handleNewPost)
 	e.Logger.Fatal(e.Start(s.listenAddr))
 }
@@ -37,6 +38,16 @@ func (s *APIServer) handleGetPosts(c echo.Context) error {
 	}
 	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJavaScriptCharsetUTF8)
 	return c.JSON(http.StatusOK, posts)
+}
+
+func (s *APIServer) handleGetPostByID(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return err
+	}
+	post, err := s.store.GetPostByID(id)
+	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJavaScriptCharsetUTF8)
+	return c.JSON(http.StatusOK, post)
 }
 
 func (s *APIServer) handleNewPost(c echo.Context) error {

@@ -108,8 +108,21 @@ func (s *PostgresStore) UpdatePost(post *types.Post) error {
 	panic("implement me")
 }
 
-func (s *PostgresStore) GetPostByID(i int) (*types.Post, error) {
-	panic("implement me")
+func (s *PostgresStore) GetPostByID(id int) (*types.Post, error) {
+	rows, err := s.db.Query("select * from post where id = $1", id)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		post := new(types.Post)
+		err := rows.Scan(&post.ID, &post.UserID, &post.Body)
+		if err != nil {
+			return nil, err
+		}
+		return post, nil
+	}
+	return nil, nil
 }
 
 func (s *PostgresStore) GetPosts() ([]*types.Post, error) {
