@@ -27,6 +27,8 @@ func (s *APIServer) Run() {
 	e.GET("/", s.handleGetPosts)
 	e.GET(":id", s.handleGetPostByID)
 	e.POST("/new-post", s.handleNewPost)
+	e.POST("/update-post/:id", s.handleEditPost)
+	e.DELETE("/delete-post/:id", s.handleDeletePost)
 	e.Logger.Fatal(e.Start(s.listenAddr))
 }
 
@@ -46,6 +48,10 @@ func (s *APIServer) handleGetPostByID(c echo.Context) error {
 		return err
 	}
 	post, err := s.store.GetPostByID(id)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
 	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationJavaScriptCharsetUTF8)
 	return c.JSON(http.StatusOK, post)
 }
@@ -60,6 +66,34 @@ func (s *APIServer) handleNewPost(c echo.Context) error {
 		Body:   c.QueryParam("body"),
 	}
 	if err := s.store.CreatePost(&post); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *APIServer) handleEditPost(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return err
+	}
+	post := types.Post{
+		ID:   id,
+		Body: c.QueryParam("body"),
+	}
+	if err := s.store.UpdatePost(&post); err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return nil
+}
+
+func (s *APIServer) handleDeletePost(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return err
+	}
+	if err := s.store.DeletePostByID(id); err != nil {
+		log.Fatal(err)
 		return err
 	}
 	return nil

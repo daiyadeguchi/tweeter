@@ -22,7 +22,7 @@ type Storage interface {
 	UpdateAccount(*types.Account) error
 	GetAccountByID(int) (*types.Account, error)
 	CreatePost(*types.Post) error
-	DeletePost(*types.Post) error
+	DeletePostByID(int) error
 	UpdatePost(*types.Post) error
 	GetPosts() ([]*types.Post, error)
 	GetPostByID(int) (*types.Post, error)
@@ -96,16 +96,26 @@ func (s *PostgresStore) CreatePost(post *types.Post) error {
 	if err != nil {
 		return err
 	}
-	log.Println("Successfully inserted:", rows)
+	log.Println("Successfully inserted: ", rows)
 	return nil
 }
 
-func (s *PostgresStore) DeletePost(post *types.Post) error {
-	panic("implement me")
+func (s *PostgresStore) DeletePostByID(id int) error {
+	rows, err := s.db.Query("delete from post where id = $1", id)
+	if err != nil {
+		return err
+	}
+	log.Println("Successfully deleted: ", rows)
+	return nil
 }
 
 func (s *PostgresStore) UpdatePost(post *types.Post) error {
-	panic("implement me")
+	rows, err := s.db.Query("update post set post_body = $1 where id = $2", post.Body, post.ID)
+	if err != nil {
+		return err
+	}
+	log.Println("Successfully updated", rows)
+	return nil
 }
 
 func (s *PostgresStore) GetPostByID(id int) (*types.Post, error) {
