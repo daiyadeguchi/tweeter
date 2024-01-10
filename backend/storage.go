@@ -76,45 +76,72 @@ func (s *PostgresStore) createPostTable() error {
 }
 
 func (s *PostgresStore) CreateAccount(account *types.Account) error {
-	panic("implement me")
-}
-
-func (s *PostgresStore) DeleteAccount(i int) error {
-	panic("implement me")
-}
-
-func (s *PostgresStore) UpdateAccount(account *types.Account) error {
-	panic("implement me")
-}
-
-func (s *PostgresStore) GetAccountByID(i int) (*types.Account, error) {
-	panic("implement me")
-}
-
-func (s *PostgresStore) CreatePost(post *types.Post) error {
-	rows, err := s.db.Query("insert into post (user_id, post_body) values ($1, $2)", post.UserID, post.Body)
+	_, err := s.db.Query("insert into account (username, email, encrypted_password) values ($1, $2, $3)", account.Username, account.Email, account.EncryptedPassword)
 	if err != nil {
 		return err
 	}
-	log.Println("Successfully inserted: ", rows)
+	log.Println("Account successfully created: ", account.Username)
+	return nil
+}
+
+func (s *PostgresStore) DeleteAccount(id int) error {
+	_, err := s.db.Query("delete from account where id = $1", id)
+	if err != nil {
+		return nil
+	}
+	log.Println("Account successfully deleted: ", id)
+	return nil
+}
+
+func (s *PostgresStore) UpdateAccount(account *types.Account) error {
+	_, err := s.db.Query("update account set username = $1, email = $2, encrypted_password = $3 where id = $4", account.Username, account.Email, account.EncryptedPassword, account.ID)
+	if err != nil {
+		return nil
+	}
+	log.Println("Account successfully updated: ", account.Username)
+	return nil
+}
+
+func (s *PostgresStore) GetAccountByID(id int) (*types.Account, error) {
+	rows, err := s.db.Query("select * from account where id = $1", id)
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		account := new(types.Account)
+		err := rows.Scan(&account.ID, &account.Username, &account.Email, &account.EncryptedPassword)
+		if err != nil {
+			return nil, err
+		}
+		return account, nil
+	}
+	return nil, nil
+}
+
+func (s *PostgresStore) CreatePost(post *types.Post) error {
+	_, err := s.db.Query("insert into post (user_id, post_body) values ($1, $2)", post.UserID, post.Body)
+	if err != nil {
+		return err
+	}
+	log.Println("Successfully inserted: ", post.UserID)
 	return nil
 }
 
 func (s *PostgresStore) DeletePostByID(id int) error {
-	rows, err := s.db.Query("delete from post where id = $1", id)
+	_, err := s.db.Query("delete from post where id = $1", id)
 	if err != nil {
 		return err
 	}
-	log.Println("Successfully deleted: ", rows)
+	log.Println("Successfully deleted: ", id)
 	return nil
 }
 
 func (s *PostgresStore) UpdatePost(post *types.Post) error {
-	rows, err := s.db.Query("update post set post_body = $1 where id = $2", post.Body, post.ID)
+	_, err := s.db.Query("update post set post_body = $1 where id = $2", post.Body, post.ID)
 	if err != nil {
 		return err
 	}
-	log.Println("Successfully updated", rows)
+	log.Println("Successfully updated", post.ID)
 	return nil
 }
 
